@@ -16,10 +16,10 @@ SNAKE_BODY_CH = CH_BACKGROUND + ' '
 DEFAULT_SPEED = 10  # Symbols per second
 TITLE = COLOR_GREEN + BOLD_TEXT + 'S N A K E' + RESET_TEXT
 DIRECTIONS = {
-    'w': (-1, 0),
-    'a': (0, -1),
-    's': (1, 0),
-    'd': (0, 1)
+    'w': (-1, 0, 's'),
+    'a': (0, -1, 'd'),
+    's': (1, 0, 'w'),
+    'd': (0, 1, 'a')
 }
 
 
@@ -123,6 +123,7 @@ class Snake:
         col: int = self.start_col
         last_key: str = None
         curr_speed: int = DEFAULT_SPEED
+        ignored_key: str = 'a'  # Default
 
         self.update_score()
         self.place_food()
@@ -130,13 +131,13 @@ class Snake:
         while True:
             if msvcrt.kbhit():
                 key = msvcrt.getwch().lower()
-                if key in DIRECTIONS:
+                if key in DIRECTIONS and key != ignored_key:
                     if key == last_key:
                         curr_speed += DEFAULT_SPEED
                     else:
                         curr_speed = DEFAULT_SPEED
                     last_key = key
-                    delta_row, delta_col = DIRECTIONS[key]
+                    delta_row, delta_col, ignored_key = DIRECTIONS[key]
             row = (row + delta_row - 1) % self.total_rows + 1
             col = (col + delta_col - 1) % self.total_cols + 1
             if self.is_collision(row, col):
