@@ -13,7 +13,7 @@ BORDER_SYMBOL = '-'
 CH_BACKGROUND = '\u001b[47;1m'
 FOOD_CH = COLOR_RED + BOLD_TEXT + '*' + RESET_TEXT
 SNAKE_BODY_CH = CH_BACKGROUND + ' '
-SPEED = 10  # Symbols per second
+DEFAULT_SPEED = 10  # Symbols per second
 TITLE = COLOR_GREEN + BOLD_TEXT + 'S N A K E' + RESET_TEXT
 DIRECTIONS = {
     'w': (-1, 0),
@@ -117,10 +117,12 @@ class Snake:
             self.delete_letter(*self.tail_pos)
 
     def run_snake(self):
-        delta_row = 0
-        delta_col = 1
+        delta_row: int = 0
+        delta_col: int = 1
         row: int = self.start_row
         col: int = self.start_col
+        last_key: str = None
+        curr_speed: int = DEFAULT_SPEED
 
         self.update_score()
         self.place_food()
@@ -129,13 +131,18 @@ class Snake:
             if msvcrt.kbhit():
                 key = msvcrt.getwch().lower()
                 if key in DIRECTIONS:
+                    if key == last_key:
+                        curr_speed += DEFAULT_SPEED
+                    else:
+                        curr_speed = DEFAULT_SPEED
+                    last_key = key
                     delta_row, delta_col = DIRECTIONS[key]
             row = (row + delta_row - 1) % self.total_rows + 1
             col = (col + delta_col - 1) % self.total_cols + 1
             if self.is_collision(row, col):
                 self.draw_game_over()
             self.move_body(row, col)
-            time.sleep(1 / SPEED)
+            time.sleep(1 / curr_speed)
 
 
 if __name__ == '__main__':
